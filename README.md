@@ -4,6 +4,10 @@ Description: The project is created for pzt learning data structure. Some code a
 Target List: 
 1.Red-Black Tree: basic structure, rotate, fix-up function, insert, delete
 
+[2021-07-05][RedBlackTree]
+1.add delete node function without fix-up
+
+
 [2021-07-04][RedBlackTree][2]
 1.Add functions for RBTreeNode to find the relationship between the node and its parent
 2.When a RBTreeNode convert to string, it will show the significant information of the node

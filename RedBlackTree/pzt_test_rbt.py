@@ -11,19 +11,28 @@ def test_tree_operation(insert_list, delete_list=[], show_type=-1, show_every_st
     print('Inserting these node now: %s' % insert_list)
     tree = RBTree()
     for i in insert_list:
-        tree.insertNode(RBTreeNode(i))
+        tree.insert_node(RBTreeNode(i))
         if show_every_step:
             tree.show_tree(show_type)
             print(split_string)
     
     tree.show_tree(show_type)
-    print('tree depth:', tree.get_tree_depth())
-    print('Deleting these node now: %s' % insert_list)
+
+
+    print('Deleting these node now: %s' % delete_list)
+    for i in delete_list:
+        del_node = tree.get_node(i)
+        tree.delete_node(del_node)
+        if show_every_step:
+            tree.show_tree(show_type)
+            print(split_string)
+    tree.show_tree(show_type)
     print(split_string) 
     print(split_string)
     
 
 if __name__ == '__main__':
-    #in_list = [6,7,8,9,1,1,2,2,3,4,5]
-    in_list = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    test_tree_operation(in_list, show_every_step=True)
+    in_list = [1,2,3,4,5,6,7,9,10,11,8]
+    #in_list = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    del_list = [6]
+    test_tree_operation(in_list, del_list, show_every_step=False)
