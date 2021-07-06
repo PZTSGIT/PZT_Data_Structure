@@ -65,29 +65,29 @@ class RBTree(object):
                 else:
                     self.not_child_of_parent()
                 
-    def node_is_not_parent_child(node):
+    def node_is_not_parent_child(self, node):
         print('Node %s is not its parent %s child' %(node.key, node.parent.key))
 
     def delete_node(self, node):
         if node == self.nil:
             return
 
-        if node == self.root:
-            self.root = node
-
         if node.left.is_nil_node() and node.right.is_nil_node():
-            
-            #FixUp
-            #DeleteNode
-            if node.is_parent_left():
-                node.parent.set_left(self.nil)
-            elif node.is_parent_right():
-                node.parent.set_right(self.nil)
+            self.delete_fix_up(node)
+            if node == self.root:
+                self.root = self.nil 
             else:
-                self.node_is_not_parent_child(node)
+                if node.is_parent_left():
+                    node.parent.set_left(self.nil)
+                elif node.is_parent_right():
+                    node.parent.set_right(self.nil)
+                else:
+                    self.node_is_not_parent_child(node)
             del node
         elif node.left.is_nil_node() and not node.right.is_nil_node():
-            #FixUp
+            self.delete_fix_up(node.right)
+            if node == self.root:
+                self.root = node.right
             if node.is_parent_left():
                 node.parent.set_left(node.right) 
             elif node.is_parent_right():
@@ -97,6 +97,9 @@ class RBTree(object):
             node.right.set_parent(node.parent)
             del node
         elif node.right.is_nil_node() and not node.left.is_nil_node():
+            self.delete_fix_up(node.left)
+            if node == self.root:
+                self.root = node.left
             if node.is_parent_left():
                 node.parent.set_left(node.left)
             elif node.is_parent_right():
@@ -112,7 +115,7 @@ class RBTree(object):
                 sub_node = sub_node.left
                 sub_node_left = sub_node.left
 
-            #FixUp
+            self.delete_fix_up(sub_node)
 
             sub_node_right = sub_node.right
             sub_node_parent = sub_node.parent
@@ -139,7 +142,69 @@ class RBTree(object):
             node_left.set_parent(sub_node)
             node_right.set_parent(sub_node)
             sub_node.set_color(node.is_red())
+            if node == self.root:
+                self.root = sub_node
             del node
+
+    def delete_fix_up(self, node):
+        if node == self.root:
+            return
+        if node.is_red():
+            node.set_color(False)
+        else:
+            if node.is_parent_left():
+                parent = node.parent
+                brother = parent.right
+                if brother.is_red():
+                    parent.set_color(True)
+                    brother.set_color(False)
+                    self.left_rotate(parent)
+                    self.delete_fix_up(node)
+                else:
+                    brother_right = brother.right
+                    brother_left = brother.left
+                    if brother_right.is_red() or brother_left.is_red():
+                        if not brother_right.is_red():
+                            brother.set_color(True)
+                            brother_left.set_color(False)
+                            self.right_rotate(brother)
+                            brother = parent.right
+                            brother_right = brother.right
+                        brother_right.set_color(False)
+                        brother.set_color(parent.is_red())
+                        parent.set_color(False)
+                        self.left_rotate(parent)
+                    else:
+                        brother.set_color(True)
+                        self.delete_fix_up(parent)
+            elif node.is_parent_right():
+                parent = node.parent
+                brother = parent.left
+                if brother.is_red():
+                    parent.set_color(True)
+                    brother.set_color(False)
+                    self.right_rotate(parent)
+                    self.delete_fix_up(node)
+                else:
+                    brother_left = brother.left
+                    brother_right = brother.right
+                    if brother_left.is_red() or brother_right.is_red():
+                        if not brother.left.is_red():
+                            brother.set_color(True)
+                            brother_right.set_color(False)
+                            self.left_rotate(brother)
+                            brother = parent.left
+                            brother_left = brother.left
+                        brother_left.set_color(False)
+                        brother.set_color(parent.is_red())
+                        parent.set_color(False)
+                        self.right_rotate(parent)
+                    else:
+                        brother.set_color(True)
+                        self.delete_fix_up(parent)
+            else:
+                self.node_is_not_parent_child(node)
+        
 
     def get_node(self, key):
         point = self.root
@@ -231,7 +296,13 @@ class RBTree(object):
         else:
             show_mid(self.root)
         print('Tree depth: %s' % self.get_tree_depth())
-
+        if not self.check_tree_rule2():
+            print('The tree is not satisfied with rule 2')
+        if self.check_tree_rule4():
+            print('These red nodes have red node children: %s' % self.check_tree_rule4())
+        if self.check_tree_rule5():
+            print('These nodes are not satisfied with rule 5: %s' % self.check_tree_rule5())
+        
     def get_tree_depth(self):
         def get_node_depth(node):
             if node == self.nil:
@@ -241,6 +312,38 @@ class RBTree(object):
             return left_depth + 1 if left_depth > right_depth else right_depth + 1
         return get_node_depth(self.root)
 
+    def check_tree_rule2(self):
+        return not self.root.is_red()
+
+    def check_tree_rule4(self):
+        error_list = []
+        def check_red(node):
+            if node == self.nil:
+                return
+            if node.is_red():
+                if node.right.is_red() or node.left.is_red():
+                    error_list.append(node.key)
+            check_red(node.left)
+            check_red(node.right)
+        check_red(self.root)
+        return error_list
+
+    def check_tree_rule5(self):
+        error_list = []
+        def check_black(node):
+            if node == self.nil:
+                return 1
+            left_num = check_black(node.left)
+            right_num = check_black(node.right)
+            if left_num == right_num:
+                return left_num if node.is_red() else left_num + 1
+            else:
+                error_list.append(node.key)
+                avg_num = (left_num + right_num)/2.0
+                return avg_num if node.is_red() else avg_num + 1
+        check_black(self.root)
+        return error_list
+                
 class RBTreeNode(object):
     def __init__(self, key=None, value=None):
         self._key = key

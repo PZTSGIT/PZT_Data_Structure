@@ -32,7 +32,7 @@ def test_tree_operation(insert_list, delete_list=[], show_type=-1, show_every_st
     
 
 if __name__ == '__main__':
-    in_list = [1,2,3,4,5,6,7,9,10,11,8]
+    in_list = [1,2,3,4,5,6,7,8,9,10]
     #in_list = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    del_list = [6]
+    del_list = [4]
     test_tree_operation(in_list, del_list, show_every_step=False)

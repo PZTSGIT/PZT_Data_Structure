@@ -4,9 +4,13 @@ Description: The project is created for pzt learning data structure. Some code a
 Target List: 
 1.Red-Black Tree: basic structure, rotate, fix-up function, insert, delete
 
+[2021-07-06][RedBlackTree]
+1.update the delete function
+2.it will show if the tree is satisfied with rule2(root is black), rule4(two red nodes cannot be neighboring) and rule5(for every node, the quantity of black node of right child and left child are equal)
+3.add fix-up function for deleting, so that deleting nodes would not influence the tree
+
 [2021-07-05][RedBlackTree]
 1.add delete node function without fix-up
-
 
 [2021-07-04][RedBlackTree][2]
 1.Add functions for RBTreeNode to find the relationship between the node and its parent
